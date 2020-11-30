@@ -7,5 +7,6 @@ public class Routes {
 
     public static void init() throws NoSuchMethodException, ClassNotFoundException {
         Router.Get("/", MainController.class, "index");
+        Router.Post("/generate", MainController.class, "generate");
     }
 }

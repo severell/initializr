@@ -13,4 +13,9 @@ public class MainController {
         resp.render("index.mustache", new HashMap<String, Object>());
     }
 
+    public void generate(Request request, Response resp) throws IOException, ViewException {
+        //TODO Implement Code to create project and send for download
+        resp.redirect("/");
+    }
+
 }
