@@ -15,6 +15,11 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.maven.shared</groupId>
+            <artifactId>maven-invoker</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+        <dependency>
             <groupId>com.squareup</groupId>
             <artifactId>javapoet</artifactId>
             <version>1.13.0</version>
