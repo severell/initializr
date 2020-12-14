@@ -4,21 +4,26 @@ import com.severell.core.config.Config;
 import com.severell.core.exceptions.ViewException;
 import com.severell.core.http.Request;
 import com.severell.core.http.Response;
+import com.severell.initializr.action.template.TemplateGenerator;
 import com.severell.initializr.internal.maven.MavenProjectGenerator;
 import com.severell.initializr.internal.zip.Zipper;
 import org.apache.commons.io.IOUtils;
 import org.apache.maven.shared.invoker.*;
-import org.eclipse.jetty.io.ByteArrayEndPoint;
 
-import java.io.*;
-import java.nio.file.DirectoryStream;
+import com.severell.initializr.action.GeneratorException;
+import com.severell.initializr.action.structure.StructureGenerator;
+import com.severell.initializr.models.MavenBuildTransformer;
+import com.severell.initializr.models.parameter.InputParameter;
+
+import javax.servlet.ServletOutputStream;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipOutputStream;
+import java.util.concurrent.ExecutionException;
+
 
 public class MainController {
 
@@ -26,7 +31,7 @@ public class MainController {
         resp.render("index.mustache", new HashMap<String, Object>());
     }
 
-    public void generate(Request request, Response resp) throws IOException, ViewException, MavenInvocationException {
+    public void generateOther(Request request, Response resp) throws IOException, ViewException, MavenInvocationException {
         System.setProperty("maven.home", Config.get("MAVEN_HOME"));
         Path file = Files.createTempDirectory("temp");
 
@@ -35,13 +40,20 @@ public class MainController {
         projectGenerator.generate(file);
 
         Zipper.zipDir(Path.of(file.toString(), request.input("artifact")));
-        resp.file(new File(Path.of(file.toString(), request.input("artifact")) + ".zip"), "application/zip", "severell.zip");
+        resp.download(new File(Path.of(file.toString(), request.input("artifact")) + ".zip"), "application/zip", "severell.zip");
     }
 
-    public void generateOurselves(Request request, Response resp) throws IOException, ViewException, MavenInvocationException {
+    public void generate(Request request, Response resp, TemplateGenerator templateGenerator) throws IOException, GeneratorException, ExecutionException, InterruptedException {
         //TODO Implement Code to create project and send for download
-
-
+        InputParameter parameter = new InputParameter(request);
+        StructureGenerator generation = new StructureGenerator(parameter, new MavenBuildTransformer(), templateGenerator.getDirectory());
+        generation.generate();
+        resp.setContentType("application/zip");
+        String headerValue = "attachment; filename=".concat(parameter.getName()).concat(".zip");
+        resp.setHeader("Content-disposition",headerValue);
+        ServletOutputStream outputStream = resp.getOutputStream();
+        InputStream inputStream = generation.download();
+        IOUtils.copy(inputStream, outputStream);
     }
 
 }

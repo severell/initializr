@@ -1,11 +1,15 @@
 package com.severell.initializr;
 
-import com.severell.initializr.auth.Auth;
-import com.severell.core.http.AppServer;
 import com.severell.core.config.Config;
 import com.severell.core.container.Container;
+import com.severell.core.http.AppServer;
 import com.severell.core.http.Router;
 import com.severell.core.providers.ServiceProvider;
+import com.severell.initializr.auth.Auth;
+import com.severell.initializr.action.GeneratorException;
+import com.severell.initializr.action.template.TemplateGenerator;
+import com.severell.initializr.models.MavenBuildTransformer;
+import com.severell.initializr.models.parameter.TemplateParameter;
 
 import javax.naming.NamingException;
 import java.util.ArrayList;
@@ -13,7 +17,7 @@ import java.util.ArrayList;
 
 public class App {
 
-    public static void main(String[] args) throws NamingException {
+    public static void main(String[] args) throws NamingException, GeneratorException {
         try {
             Config.loadConfig();
         }catch (Exception e) {
@@ -31,6 +35,15 @@ public class App {
 
         for(ServiceProvider provider : providers) {
             provider.register();
+        }
+
+        TemplateParameter templateParameter = new TemplateParameter();
+        TemplateGenerator templateGenerator = new TemplateGenerator(templateParameter, new MavenBuildTransformer());
+        boolean generated = templateGenerator.generate();
+        if(generated) {
+            c.singleton(TemplateGenerator.class, templateGenerator);
+        }else{
+            throw new GeneratorException("Unable to build template");
         }
 
         try {
