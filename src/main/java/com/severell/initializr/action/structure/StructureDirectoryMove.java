@@ -7,16 +7,30 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StructureDirectoryMove<Source, Dest> {
     private BiFunction<Source, Dest, Boolean> callback;
     private String mainDir, separator;
+    //control util
+    private Boolean useParent = false;
+    private Boolean stopper = false;
 
     StructureDirectoryMove(String separator){
         this.separator = separator;
         this.callback = this::apply;
+    }
+
+    public Boolean getUseParent() {
+        return useParent;
+    }
+
+    public void setUseParent(Boolean useParent) {
+        this.stopper = false;
+        this.useParent = useParent;
     }
 
     private Boolean apply(Source source, Dest dest) {
@@ -26,19 +40,23 @@ public class StructureDirectoryMove<Source, Dest> {
 
     private boolean moveFolder(String source, String dest)  {
         boolean status = true;
-        Path newPath = Paths.get(mainDir.concat(separator).concat(dest.replace(".", separator)));
         try (Stream<Path> paths = Files.walk(Paths.get(mainDir))) {
             paths.filter(Files::isDirectory)
                     .forEach(path -> {
                         String currentPath = Paths.get(mainDir).relativize(path).toString().replace(separator, ".");
-                        if(currentPath.equals(source)){
+                        if(currentPath.contains(source) && !stopper){
+                            Path newPath;
                             try {
+                                newPath = resolvePath(currentPath, dest);
                                 FileUtils.copyDirectory(path.toFile(), newPath.toFile());
                                 FileUtils.deleteDirectory(path.toFile());
                                 if(path.compareTo(newPath) > 0){
-                                    Path pathToDelete = newPath.resolveSibling(source.split(separator)[0]);
+                                    String[] pathBranch = source.split("\\.");
+                                    String pathTree = Arrays.stream(pathBranch).collect(Collectors.joining(separator));
+                                    Path pathToDelete = newPath.resolveSibling(pathTree);
                                     FileUtils.deleteDirectory(pathToDelete.toFile());
                                 }
+                                stopper = true;
                             } catch (IOException e) {
                                 e.printStackTrace();
                             }
@@ -79,5 +97,19 @@ public class StructureDirectoryMove<Source, Dest> {
     private String getRelativePackage(Path path){
         Path relativePackage = Paths.get(mainDir).relativize(path);
         return String.valueOf(relativePackage).replace(separator, ".");
+    }
+
+    private Path resolvePath(String currentPath, String destPath){
+        Path newPath;
+        if(useParent){
+            String[] list = currentPath.split("\\.");
+            int siblingOffset = list.length - 1;
+            String pathTree = String.join(".", Arrays.asList(list).subList(0, siblingOffset));
+            String newDest = pathTree.concat(".").concat(destPath);
+            newPath = Paths.get(mainDir.concat(separator).concat(newDest.replace(".", separator)));
+        }else {
+            newPath = Paths.get(mainDir.concat(separator).concat(destPath.replace(".", separator)));
+        }
+        return newPath;
     }
 }
