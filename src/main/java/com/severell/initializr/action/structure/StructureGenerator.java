@@ -128,7 +128,7 @@ public class StructureGenerator {
                 }
                 case PACKAGE:{
                     String javaDir = getDirectory().toString() + fileOperation.getJavaDirPath();
-                    fileOperation.renameDirectoryPackage(javaDir, templateName, structureName);
+                    fileOperation.renameDirectoryPackage(javaDir, templateName + ".initializr", structureName + "." + inputParameter.getArtifactId());
                     break;
                 }
                 default:

@@ -1,5 +1,6 @@
 package com.severell.initializr.action.template;
 
+import com.severell.core.config.Config;
 import com.severell.initializr.action.FileOperation;
 import com.severell.initializr.models.parameter.TemplateParameter;
 import org.apache.commons.io.FileUtils;
@@ -56,7 +57,7 @@ public class TemplateFileOperation extends FileOperation {
         properties.setProperty("archetypeGroupId", parameter.getArcheTypeGroupId());
         properties.setProperty("archetypeArtifactId", parameter.getArcheTypeArtifactId());
         properties.setProperty("archetypeVersion", parameter.getArcheTypeVersion());
-        properties.setProperty("archetypeCatalog", parameter.getArcheTypeCatalog());
+//        properties.setProperty("archetypeCatalog", parameter.getArcheTypeCatalog());
         return properties;
     }
 
@@ -70,6 +71,7 @@ public class TemplateFileOperation extends FileOperation {
 
     private InvocationRequest getLoader(){
         InvocationRequest request = new DefaultInvocationRequest();
+        request.setBatchMode(true);
         request.setGoals(Collections.singletonList("archetype:generate"));
         request.setProperties(getTemplateProperties());
         return request;
@@ -78,7 +80,7 @@ public class TemplateFileOperation extends FileOperation {
     private boolean getInvoker(InvocationRequest request){
         boolean status = false;
         Invoker invoker = new DefaultInvoker();
-        invoker.setMavenHome(new File(System.getenv("MAVEN_HOME")));
+        invoker.setMavenHome(new File(Config.get("MAVEN_HOME")));
         Path dir = getTemplatePath();
         try {
             deleteDir(dir);
@@ -100,8 +102,8 @@ public class TemplateFileOperation extends FileOperation {
 
     public boolean generate(){
         Function<InvocationRequest, Boolean> generateTemplate = this::getInvoker;
-        InvocationRequest preLoader = getPreLoader();
-        boolean status =  generateTemplate.apply(preLoader);
+//        InvocationRequest preLoader = getPreLoader();
+        boolean status =  true;//generateTemplate.apply(preLoader);
         return status ? generateTemplate.apply(getLoader()) : status;
     }
 

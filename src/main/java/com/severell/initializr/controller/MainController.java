@@ -44,7 +44,6 @@ public class MainController {
     }
 
     public void generate(Request request, Response resp, TemplateGenerator templateGenerator) throws IOException, GeneratorException, ExecutionException, InterruptedException {
-        //TODO Implement Code to create project and send for download
         InputParameter parameter = new InputParameter(request);
         StructureGenerator generation = new StructureGenerator(parameter, new MavenBuildTransformer(), templateGenerator.getDirectory());
         generation.generate();
