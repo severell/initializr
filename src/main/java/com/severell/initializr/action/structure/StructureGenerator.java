@@ -53,16 +53,11 @@ public class StructureGenerator {
         //TODO handle error, throw exception
     }
 
-    public InputStream download() throws ExecutionException, InterruptedException, IOException {
-        InputStream stream = null;
-        try {
-            String name = inputParameter.getName();
-            Path path = fileOperation.getZippedDirectory(name);
-            stream =  Files.newInputStream(path);
-        } finally {
-            fileOperation.cleanUp();
-        }
-        return stream;
+    public Path download() throws ExecutionException, InterruptedException {
+        Path path;
+        String name = inputParameter.getName();
+        path = fileOperation.getZippedDirectory(name);
+        return path;
     }
 
     private void nameHandler(){
@@ -139,5 +134,9 @@ public class StructureGenerator {
                     break;
             }
         });
+    }
+
+    public void cleanUp(){
+        fileOperation.cleanUp();
     }
 }
