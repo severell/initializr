@@ -104,7 +104,8 @@ public class StructureFileOperation extends FileOperation {
         return paths;
     }
 
-    Boolean renameDirectoryPackage(String startingDirectory, String oldValue, String newValue){
+    Boolean renameDirectoryPackage(String startingDirectory, String oldValue, String newValue, boolean useParent){
+        directoryMove.setUseParent(useParent);
         return directoryMove.call(startingDirectory, oldValue, newValue);
     }
 

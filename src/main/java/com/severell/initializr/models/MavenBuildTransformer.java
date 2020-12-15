@@ -11,7 +11,7 @@ public class MavenBuildTransformer implements BuildTransformer {
 
     @Override
     public List<Permission> artifactAccess() {
-        return List.of(Permission.BUILD_CONFIG, Permission.JAVA);
+        return List.of(Permission.BUILD_CONFIG, Permission.JAVA, Permission.PACKAGE);
     }
 
     @Override

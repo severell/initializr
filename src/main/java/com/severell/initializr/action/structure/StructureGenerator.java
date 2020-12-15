@@ -22,6 +22,8 @@ public class StructureGenerator {
     private Parameter templateParam = new TemplateParameter();
     private Path sourcePath;
     private Path targetPath;
+    //argument for move/rename utility
+    private Boolean useParent = false;
 
 
     public StructureGenerator(InputParameter param, BuildTransformer transformer, Path source){
@@ -74,12 +76,14 @@ public class StructureGenerator {
         List<Permission> permission = transformer.artifactAccess();
         String value = templateParam.getArtifactId();
         String newValue = inputParameter.getArtifactId();
+        useParent = true;
         handler(permission, value, newValue);
     }
     private void groupHandler(){
         List<Permission> permission = transformer.groupAccess();
         String value = templateParam.getGroupId();
         String newValue = inputParameter.getGroupId();
+        useParent = false;
         handler(permission, value, newValue);
     }
     private void versionHandler(){
@@ -128,7 +132,7 @@ public class StructureGenerator {
                 }
                 case PACKAGE:{
                     String javaDir = getDirectory().toString() + fileOperation.getJavaDirPath();
-                    fileOperation.renameDirectoryPackage(javaDir, templateName + ".initializr", structureName + "." + inputParameter.getArtifactId());
+                    fileOperation.renameDirectoryPackage(javaDir, templateName, structureName, useParent);
                     break;
                 }
                 default:
