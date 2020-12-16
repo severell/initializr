@@ -6,7 +6,7 @@ public class MavenBuildTransformer implements BuildTransformer {
 
     @Override
     public List<Permission> nameAccess() {
-        return List.of(Permission.BUILD_CONFIG);
+        return List.of();
     }
 
     @Override

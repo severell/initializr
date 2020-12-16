@@ -16,12 +16,12 @@ public class TemplateParameter implements Parameter{
 
     @Override
     public String getArtifactId() {
-        return Config.get("ARTIFACT_ID", "initializr");
+        return Config.get("ARTIFACT_ID", "##test##");
     }
 
     @Override
     public String getGroupId() {
-        return Config.get("GROUP_ID", "com.severell");
+        return Config.get("GROUP_ID", "___tester___");
     }
 
     public String getSeverellName() {
