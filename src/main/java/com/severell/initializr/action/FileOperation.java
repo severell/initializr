@@ -5,6 +5,7 @@ import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.parallel.InputStreamSupplier;
+import org.apache.commons.io.Charsets;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -27,19 +28,19 @@ public abstract class FileOperation {
         return fileSeparator;
     }
 
-    public Path zip(Path sourcePath, String name) throws ExecutionException, InterruptedException {
+    protected Path zip(Path sourcePath, String name) throws ExecutionException, InterruptedException {
         String zippedPath = String.valueOf(sourcePath).concat(fileSeparator).concat(name).concat(archiveExtension);
         Path path = Paths.get(zippedPath);
-        zipDirectory(sourcePath, path);
+        zipDirectory(sourcePath, path, name);
         return path;
     }
 
-    private void zipDirectory(Path rawDir, Path zipDir) throws ExecutionException, InterruptedException {
+    private void zipDirectory(Path rawDir, Path zipDir, String name) throws ExecutionException, InterruptedException {
         ParallelScatterZipCreator scatterZip = new ParallelScatterZipCreator();
         try(FileOutputStream outputStream = new FileOutputStream(zipDir.toFile())) {
             try(ZipArchiveOutputStream zipOutputStream = new ZipArchiveOutputStream(outputStream)) {
                 zipOutputStream.setUseZip64(Zip64Mode.AsNeeded);
-                Files.walk(rawDir).parallel().filter(path -> path.toFile().isFile()).forEach(path -> {
+                Files.walk(rawDir).parallel().filter(path -> path.toFile().isFile() && !path.equals(zipDir)).forEach(path -> {
                     InputStreamSupplier streamSupplier = () -> {
                         InputStream pathStream = null;
                         try {
@@ -49,7 +50,7 @@ public abstract class FileOperation {
                         }
                         return pathStream;
                     };
-                    ZipArchiveEntry zipArchiveEntry = new ZipArchiveEntry(String.valueOf(rawDir.relativize(path)));
+                    ZipArchiveEntry zipArchiveEntry = new ZipArchiveEntry(name.concat(fileSeparator).concat( String.valueOf(rawDir.relativize(path))));
                     zipArchiveEntry.setMethod(ZipEntry.DEFLATED);
                     scatterZip.addArchiveEntry(zipArchiveEntry, streamSupplier);
                 });
