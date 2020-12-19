@@ -24,6 +24,11 @@ public class TemplateParameter implements Parameter{
         return Config.get("GROUP_ID", "___tester___");
     }
 
+    @Override
+    public String getDescription() {
+        return Config.get("DESCRIPTION", "__description__");
+    }
+
     public String getSeverellName() {
         return Config.get("SEVERELL_NAME", "severell");
     }

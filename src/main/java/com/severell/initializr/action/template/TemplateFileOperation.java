@@ -2,20 +2,23 @@ package com.severell.initializr.action.template;
 
 import com.severell.core.config.Config;
 import com.severell.initializr.action.FileOperation;
+import com.severell.initializr.action.structure.StructureGenerator;
 import com.severell.initializr.models.parameter.TemplateParameter;
 import org.apache.commons.io.FileUtils;
 import org.apache.maven.shared.invoker.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.function.Function;
 
 public class TemplateFileOperation extends FileOperation {
+    private final static Logger LOG = LoggerFactory.getLogger(TemplateFileOperation.class);
     private TemplateParameter parameter ;
     private String dirPath;
 
@@ -34,7 +37,7 @@ public class TemplateFileOperation extends FileOperation {
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         return path;
     }
@@ -57,16 +60,7 @@ public class TemplateFileOperation extends FileOperation {
         properties.setProperty("archetypeGroupId", parameter.getArcheTypeGroupId());
         properties.setProperty("archetypeArtifactId", parameter.getArcheTypeArtifactId());
         properties.setProperty("archetypeVersion", parameter.getArcheTypeVersion());
-//        properties.setProperty("archetypeCatalog", parameter.getArcheTypeCatalog());
         return properties;
-    }
-
-    private InvocationRequest getPreLoader(){
-        InvocationRequest request = new DefaultInvocationRequest();
-        request.setPomFile( new File( getProjectDirectoryPath().toAbsolutePath().toString().concat(getFileSeparator()).concat("pom.xml") ) );
-        request.setGoals(Arrays.asList("clean", "install"));
-        request.setProperties(getTemplateProperties());
-        return request;
     }
 
     private InvocationRequest getLoader(){
@@ -85,7 +79,7 @@ public class TemplateFileOperation extends FileOperation {
         try {
             deleteDir(dir);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         invoker.setWorkingDirectory(new File(getDirectoryAbsolutePath()));
         InvocationResult result = null;
@@ -95,16 +89,14 @@ public class TemplateFileOperation extends FileOperation {
                 status = true;
             }
         } catch (MavenInvocationException e) {
-            e.printStackTrace();
+            LOG.error("Invocation error has occurred", e);
         }
         return status;
     }
 
     public boolean generate(){
         Function<InvocationRequest, Boolean> generateTemplate = this::getInvoker;
-//        InvocationRequest preLoader = getPreLoader();
-        boolean status =  true;//generateTemplate.apply(preLoader);
-        return status ? generateTemplate.apply(getLoader()) : status;
+        return generateTemplate.apply(getLoader());
     }
 
     private void deleteDir(Path folder) throws IOException {
@@ -132,7 +124,7 @@ public class TemplateFileOperation extends FileOperation {
             try {
                 FileUtils.forceDelete(file);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("IO error has occurred", e);
             }
         }
     }

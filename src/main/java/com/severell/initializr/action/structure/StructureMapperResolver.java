@@ -1,5 +1,8 @@
 package com.severell.initializr.action.structure;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.*;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -14,6 +17,7 @@ import java.util.PrimitiveIterator;
 
 public class StructureMapperResolver {
 
+    private final static Logger LOG = LoggerFactory.getLogger(StructureMapperResolver.class);
     private static final String RANDOM_ACCESS_MODE = "rw";
     private static  final FileChannel.MapMode FILE_CHANNEL_MODE = FileChannel.MapMode.READ_WRITE;
     private final short offset = 1;
@@ -38,7 +42,7 @@ public class StructureMapperResolver {
                 }
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         return  mappers;
     }
@@ -65,7 +69,7 @@ public class StructureMapperResolver {
             out.clear();
             modified = true;
         } catch (IOException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOG.error("Exception has occurred", e);
         }
         return modified;
     }
@@ -89,7 +93,7 @@ public class StructureMapperResolver {
             out.clear();
             modified = true;
         } catch (IOException | InvocationTargetException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException | ClassNotFoundException e) {
-            e.printStackTrace();
+            LOG.error("Exception has occurred", e);
         }
         return modified;
     }
@@ -102,7 +106,7 @@ public class StructureMapperResolver {
             fileInput.getChannel().read(bytes, start);
             readBytes = bytes.array();
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         return new String(readBytes, StandardCharsets.UTF_8);
     }

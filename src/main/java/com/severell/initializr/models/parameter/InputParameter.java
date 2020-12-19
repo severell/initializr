@@ -1,19 +1,20 @@
 package com.severell.initializr.models.parameter;
 
-import com.severell.core.crypto.PasswordUtils;
 import com.severell.core.http.Request;
 import com.severell.initializr.action.GeneratorException;
-import org.apache.commons.io.FileUtils;
+import com.severell.initializr.action.structure.StructureGenerator;
 import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.lang.model.SourceVersion;
 import javax.servlet.ServletContext;
+import java.util.Arrays;
 import java.util.List;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class InputParameter implements Parameter{
-
+    private final static Logger LOG = LoggerFactory.getLogger(InputParameter.class);
     private Request request = null;
 
     public InputParameter(Request request) throws GeneratorException {
@@ -41,6 +42,11 @@ public class InputParameter implements Parameter{
         return request.input("group");
     }
 
+    @Override
+    public String getDescription() {
+        return request.input("description");
+    }
+
     public String getSessionHash(){
         return request.getSession().getId().replaceAll("\\W+", "_");
     }
@@ -50,6 +56,8 @@ public class InputParameter implements Parameter{
     }
 
     private void validateInput() throws GeneratorException {
+        LOG.info(String.format("validating input  Name:%s Artifact:%s,Group:%s,Version:%s, Description:%s...",
+                getName(), getArtifactId(),getGroupId(), getVersion(), getDescription()));
         String exceptions = buildException();
         if(StringUtils.isNotEmpty(exceptions)){
             throw new GeneratorException(exceptions);
@@ -58,10 +66,17 @@ public class InputParameter implements Parameter{
     private String buildException(){
         StringBuilder exceptionBuilder = new StringBuilder();
         List<String> inputLexemes = List.of(getName(),getArtifactId(), getGroupId(), getVersion());
-        List<String> filteredInputLexemes = inputLexemes.parallelStream().filter(SourceVersion::isKeyword).collect(Collectors.toList());
-        if( filteredInputLexemes.size() != inputLexemes.size()){
-            filteredInputLexemes.parallelStream().forEach(input -> exceptionBuilder.append(" Use of Java keyword is forbidden -> ").append(input).append("\n"));
-        }
+        List<List<String>> filteredInputLexemes = inputLexemes.stream().map(e -> {
+            return Arrays.stream(e.split("\\.")).filter(SourceVersion::isKeyword).collect(Collectors.toList());
+        }).collect(Collectors.toList());
+
+        filteredInputLexemes.forEach(input -> {
+                if(input != null && !input.isEmpty()) {
+                    exceptionBuilder.append(" Use of Java keyword is forbidden -> ").append(String.join(".", input)).append("\n");
+                }
+            }
+        );
+
         List<String> startLexemes = List.of(getName(),getArtifactId(), getGroupId());
         startLexemes.parallelStream().forEach(input -> {
             boolean startsWithNumber = input.matches("^(\\d+.*|-)");

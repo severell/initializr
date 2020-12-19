@@ -15,5 +15,7 @@ public interface BuildTransformer {
 
     List<Permission> dependencyAccess();
 
+    List<Permission> descriptionAccess();
+
     String getBuildConfigPath();
 }
