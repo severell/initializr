@@ -1,6 +1,8 @@
 package com.severell.initializr.action.structure;
 
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -13,6 +15,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StructureDirectoryMove<Source, Dest> {
+    private final static Logger LOG = LoggerFactory.getLogger(StructureDirectoryMove.class);
+
     private BiFunction<Source, Dest, Boolean> callback;
     private String mainDir, separator;
     //control util
@@ -41,30 +45,31 @@ public class StructureDirectoryMove<Source, Dest> {
     private boolean moveFolder(String source, String dest)  {
         boolean status = true;
         try (Stream<Path> paths = Files.walk(Paths.get(mainDir))) {
-            paths.filter(Files::isDirectory)
-                    .forEach(path -> {
-                        String currentPath = Paths.get(mainDir).relativize(path).toString().replace(separator, ".");
-                        if(currentPath.contains(source) && !stopper){
-                            Path newPath;
-                            try {
-                                newPath = resolvePath(currentPath, dest);
-                                FileUtils.copyDirectory(path.toFile(), newPath.toFile());
-                                FileUtils.deleteDirectory(path.toFile());
-                                if(path.compareTo(newPath) > 0){
-                                    String[] pathBranch = source.split("\\.");
-                                    String pathTree = Arrays.stream(pathBranch).collect(Collectors.joining(separator));
-                                    Path pathToDelete = newPath.resolveSibling(pathTree);
-                                    FileUtils.deleteDirectory(pathToDelete.toFile());
-                                }
-                                stopper = true;
-                            } catch (IOException e) {
-                                e.printStackTrace();
+            paths.filter(Files::isDirectory).forEach(path -> {
+                String currentPath = Paths.get(mainDir).relativize(path).toString().replace(separator, ".");
+                if(currentPath.contains(source) && !stopper){
+                    Path newPath;
+                    try {
+                        newPath = resolvePath(currentPath, dest);
+                        FileUtils.copyDirectory(path.toFile(), newPath.toFile());
+                        FileUtils.deleteDirectory(path.toFile());
+                        if(path.compareTo(newPath) > 0){
+                            String[] pathBranch = source.split("\\.");
+                            String pathTree = Arrays.stream(pathBranch).collect(Collectors.joining(separator));
+                            Path pathToDelete = newPath.resolveSibling(pathTree);
+                            if(Files.exists(pathToDelete)) {
+                                FileUtils.deleteDirectory(pathToDelete.toFile());
                             }
-
                         }
-                    });
+                        stopper = true;
+                    } catch (IOException e) {
+                        LOG.error("IO error has occurred", e);
+                    }
+
+                }
+            });
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
             status = false;
         }
         return status;

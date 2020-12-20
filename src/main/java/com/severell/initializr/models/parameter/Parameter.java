@@ -10,4 +10,6 @@ public interface Parameter {
 
     public String getGroupId();
 
+    public String getDescription();
+
 }

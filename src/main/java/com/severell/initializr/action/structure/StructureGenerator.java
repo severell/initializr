@@ -5,17 +5,15 @@ import com.severell.initializr.models.Permission;
 import com.severell.initializr.models.parameter.InputParameter;
 import com.severell.initializr.models.parameter.Parameter;
 import com.severell.initializr.models.parameter.TemplateParameter;
-import org.codehaus.plexus.util.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 public class StructureGenerator {
+    private final static Logger LOG = LoggerFactory.getLogger(StructureGenerator.class);
     private BuildTransformer transformer;
     private StructureFileOperation fileOperation;
     private InputParameter inputParameter;
@@ -38,19 +36,18 @@ public class StructureGenerator {
     }
 
     public void generate(){
-        String structurePath = fileOperation.copyTemplateToLocal(sourcePath);
-        if(StringUtils.isNotEmpty(structurePath)){
-            targetPath = Paths.get(structurePath);
+        LOG.info(String.format("Generating structure to  %s...", sourcePath));
+        targetPath = fileOperation.copyTemplateToLocal(sourcePath);
+        if(targetPath != null){
             try {
                 nameHandler();
                 groupHandler();
                 artifactHandler();
                 versionHandler();
             }catch (Exception ex){
-                ex.getStackTrace();
+                LOG.error("Exception thrown: ", ex);
             }
         }
-        //TODO handle error, throw exception
     }
 
     public Path download() throws ExecutionException, InterruptedException {

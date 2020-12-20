@@ -1,11 +1,14 @@
 package com.severell.initializr.action;
 
+import com.severell.initializr.action.structure.StructureGenerator;
 import org.apache.commons.compress.archivers.zip.ParallelScatterZipCreator;
 import org.apache.commons.compress.archivers.zip.Zip64Mode;
 import org.apache.commons.compress.archivers.zip.ZipArchiveEntry;
 import org.apache.commons.compress.archivers.zip.ZipArchiveOutputStream;
 import org.apache.commons.compress.parallel.InputStreamSupplier;
 import org.apache.commons.io.Charsets;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -18,6 +21,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.zip.ZipEntry;
 
 public abstract class FileOperation {
+    private final static Logger LOG = LoggerFactory.getLogger(FileOperation.class);
     private static final String fileSeparator = File.separator;
     private static final String archiveExtension = ".zip";
 
@@ -46,7 +50,7 @@ public abstract class FileOperation {
                         try {
                             pathStream = Files.newInputStream(path);
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            LOG.error("IO error has occurred", e);
                         }
                         return pathStream;
                     };
@@ -57,7 +61,7 @@ public abstract class FileOperation {
                 scatterZip.writeTo(zipOutputStream);
             }
         }catch (IOException ex){
-            ex.printStackTrace();
+            LOG.error("IO error has occurred", ex);
         }
     }
 }

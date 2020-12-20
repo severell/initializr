@@ -3,6 +3,8 @@ package com.severell.initializr.action.structure;
 import com.severell.initializr.action.FileOperation;
 import com.severell.initializr.models.parameter.InputParameter;
 import org.apache.commons.io.FileUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class StructureFileOperation extends FileOperation {
+    private final static Logger LOG = LoggerFactory.getLogger(StructureGenerator.class);
     private StructureDirectoryCopy<Path, Path> directoryCopy;
     private StructureDirectoryMove<String, String> directoryMove;
     private StructureMapperResolver resolver;
@@ -27,41 +30,41 @@ public class StructureFileOperation extends FileOperation {
         resolver = new StructureMapperResolver();
     }
 
-    private Path getStructureDirectoryPath(){
+    protected Path getStructureDirectoryPath(){
         String pathDir = System.getProperty("java.io.tmpdir") + this.getFileSeparator() + parameter.getName() + parameter.getSessionHash() ;
         Path path = Paths.get(pathDir);
         try {
             Files.createDirectories(path);
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         return path;
     }
 
     private String getMain(){
-        return File.separator.concat("src").concat(File.separator).concat("main");
+        return this.getFileSeparator().concat("src").concat(this.getFileSeparator()).concat("main");
     }
 
     String getDBDirPath(){
-        return File.separator.concat("src").concat(File.separator).concat("db");
+        return this.getFileSeparator().concat("src").concat(this.getFileSeparator()).concat("db");
     }
 
     String getJavaDirPath(){
-        return getMain().concat(File.separator).concat("java");
+        return getMain().concat(this.getFileSeparator()).concat("java");
     }
 
     String getSeverellConfigPath(){
-        return getResourceDirPath().concat(File.separator).concat(".env");
+        return getResourceDirPath().concat(this.getFileSeparator()).concat(".env");
     }
 
     String getResourceDirPath(){
-        return  getMain().concat(File.separator).concat("resources");
+        return  getMain().concat(this.getFileSeparator()).concat("resources");
     }
 
-    String copyTemplateToLocal(Path sourcePath){
+    Path copyTemplateToLocal(Path sourcePath){
         Path destPath = getStructureDirectoryPath();
         boolean status = directoryCopy.call(sourcePath, destPath);
-        return status ? destPath.toAbsolutePath().toString() : "";
+        return status ? destPath : null;
     }
 
     void modifyStructureFile(String path, String value, String replacee){
@@ -99,7 +102,7 @@ public class StructureFileOperation extends FileOperation {
         try (Stream<Path> stream = Files.walk(originPath)) {
             paths = stream.filter(path -> path.toFile().isFile()).collect(Collectors.toList());
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         return paths;
     }
@@ -119,7 +122,7 @@ public class StructureFileOperation extends FileOperation {
             try {
                 FileUtils.forceDelete(file);
             } catch (IOException e) {
-                e.printStackTrace();
+                LOG.error("IO error has occurred", e);
             }
         }
     }

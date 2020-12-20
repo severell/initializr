@@ -30,6 +30,11 @@ public class MavenBuildTransformer implements BuildTransformer {
     }
 
     @Override
+    public List<Permission> descriptionAccess() {
+        return  List.of();
+    }
+
+    @Override
     public String getBuildConfigPath() {
         return "pom.xml";
     }

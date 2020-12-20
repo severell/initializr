@@ -1,5 +1,8 @@
 package com.severell.initializr.action.structure;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,7 +14,7 @@ import java.util.stream.Stream;
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class StructureDirectoryCopy<Source, Dest>{
-
+    private final static Logger LOG = LoggerFactory.getLogger(StructureDirectoryCopy.class);
     private BiFunction<Source, Dest, Boolean> callback;
 
     StructureDirectoryCopy(){
@@ -30,7 +33,7 @@ public class StructureDirectoryCopy<Source, Dest>{
             stream.forEach(path -> copy(path, dest.resolve(source.relativize(path))));
             status = true;
         } catch (IOException e) {
-            e.printStackTrace();
+            LOG.error("IO error has occurred", e);
         }
         return status;
     }
