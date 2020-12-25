@@ -36,7 +36,7 @@ public class StructureGenerator {
     }
 
     public void generate(){
-        LOG.info(String.format("Generating structure to  %s...", sourcePath));
+        LOG.info(String.format("Generating structure from  %s...", sourcePath));
         targetPath = fileOperation.copyTemplateToLocal(sourcePath);
         if(targetPath != null){
             try {
@@ -46,7 +46,9 @@ public class StructureGenerator {
                 versionHandler();
             }catch (Exception ex){
                 LOG.error("Exception thrown: ", ex);
+                return;
             }
+            LOG.info(String.format("Generating structure to  %s...", targetPath));
         }
     }
 
@@ -120,6 +122,11 @@ public class StructureGenerator {
                     String resourceDir = getDirectory().toString();
                     List<Path> paths = fileOperation.getAllFilePaths(resourceDir);
                     paths.forEach(path -> fileOperation.modifyStructureFile(path.toAbsolutePath().toString(), templateName, structureName));
+                    break;
+                }
+                case SEVERELL_JSON:{
+                    String configPath = getDirectory().toString()  + fileOperation.getSeverellJsonPath();
+                    fileOperation.modifyStructureFile(configPath, templateName, structureName);
                     break;
                 }
                 case PACKAGE:{

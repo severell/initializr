@@ -7,5 +7,6 @@ public enum Permission {
     DB,
     BUILD_CONFIG,
     SEVERELL_CONFIG,
+    SEVERELL_JSON,
     PACKAGE
 }
