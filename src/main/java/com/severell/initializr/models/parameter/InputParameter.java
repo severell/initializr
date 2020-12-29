@@ -2,7 +2,6 @@ package com.severell.initializr.models.parameter;
 
 import com.severell.core.http.Request;
 import com.severell.initializr.action.GeneratorException;
-import com.severell.initializr.action.structure.StructureGenerator;
 import org.codehaus.plexus.util.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,10 +10,13 @@ import javax.lang.model.SourceVersion;
 import javax.servlet.ServletContext;
 import java.util.Arrays;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class InputParameter implements Parameter{
     private final static Logger LOG = LoggerFactory.getLogger(InputParameter.class);
+    private final static Pattern inputStarterPattern = Pattern.compile("^(\\d+.*|-)");
     private Request request = null;
 
     public InputParameter(Request request) throws GeneratorException {
@@ -56,7 +58,7 @@ public class InputParameter implements Parameter{
     }
 
     private void validateInput() throws GeneratorException {
-        LOG.info(String.format("validating input  Name:%s Artifact:%s,Group:%s,Version:%s, Description:%s...",
+        LOG.info(String.format("validating input  Name:%s Artifact:%s,Group:%s,Version:%s,Description:%s...",
                 getName(), getArtifactId(),getGroupId(), getVersion(), getDescription()));
         String exceptions = buildException();
         if(StringUtils.isNotEmpty(exceptions)){
@@ -70,17 +72,16 @@ public class InputParameter implements Parameter{
             return Arrays.stream(e.split("\\.")).filter(SourceVersion::isKeyword).collect(Collectors.toList());
         }).collect(Collectors.toList());
 
-        filteredInputLexemes.forEach(input -> {
-                if(input != null && !input.isEmpty()) {
-                    exceptionBuilder.append(" Use of Java keyword is forbidden -> ").append(String.join(".", input)).append("\n");
-                }
+        for (List<String> filteredInputLexeme : filteredInputLexemes) {
+            if (filteredInputLexeme != null && !filteredInputLexeme.isEmpty()) {
+                exceptionBuilder.append(" Use of Java keyword is forbidden -> ").append(String.join(".", filteredInputLexeme)).append("\n");
             }
-        );
+        }
 
         List<String> startLexemes = List.of(getName(),getArtifactId(), getGroupId());
         startLexemes.parallelStream().forEach(input -> {
-            boolean startsWithNumber = input.matches("^(\\d+.*|-)");
-            if(startsWithNumber) {
+            Matcher matchStartWithNumber = inputStarterPattern.matcher(input);
+            if(matchStartWithNumber.find()) {
                 exceptionBuilder.append(" Can't start input with number digit -> ").append(input).append("\n");
             }
         });

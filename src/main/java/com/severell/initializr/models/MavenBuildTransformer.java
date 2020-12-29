@@ -11,12 +11,12 @@ public class MavenBuildTransformer implements BuildTransformer {
 
     @Override
     public List<Permission> artifactAccess() {
-        return List.of(Permission.BUILD_CONFIG, Permission.JAVA, Permission.PACKAGE);
+        return List.of(Permission.BUILD_CONFIG, Permission.JAVA, Permission.PACKAGE, Permission.SEVERELL_JSON);
     }
 
     @Override
     public List<Permission> groupAccess() {
-        return List.of( Permission.BUILD_CONFIG, Permission.JAVA, Permission.PACKAGE);
+        return List.of( Permission.BUILD_CONFIG, Permission.JAVA, Permission.PACKAGE, Permission.SEVERELL_JSON);
     }
 
     @Override

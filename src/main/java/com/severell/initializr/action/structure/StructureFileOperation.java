@@ -57,6 +57,10 @@ public class StructureFileOperation extends FileOperation {
         return getResourceDirPath().concat(this.getFileSeparator()).concat(".env");
     }
 
+    String getSeverellJsonPath(){
+        return this.getFileSeparator().concat("severell.json");
+    }
+
     String getResourceDirPath(){
         return  getMain().concat(this.getFileSeparator()).concat("resources");
     }
