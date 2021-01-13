@@ -24,7 +24,7 @@ public class TemplateFileOperation extends FileOperation {
 
     TemplateFileOperation(TemplateParameter param){
         parameter = param;
-        dirPath = System.getProperty("java.io.tmpdir").concat( this.getFileSeparator()).concat(parameter.getName());
+        dirPath = Config.get("TEMPLATE_DIR").concat( this.getFileSeparator()).concat(parameter.getName());
     }
 
     private Path getProjectDirectoryPath(){
@@ -43,7 +43,8 @@ public class TemplateFileOperation extends FileOperation {
     }
 
     Path getDirectoryPath(){
-        String dirPath =  getTemplatePath().toAbsolutePath().toString().concat(this.getFileSeparator()).concat(parameter.getArtifactId());
+        String dirPath =  getTemplatePath().toAbsolutePath().toString()
+                .concat(this.getFileSeparator()).concat(parameter.getArtifactId());
         return Paths.get(dirPath);
     }
 

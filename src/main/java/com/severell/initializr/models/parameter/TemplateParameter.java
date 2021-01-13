@@ -11,7 +11,7 @@ public class TemplateParameter implements Parameter{
 
     @Override
     public String getVersion() {
-        return Config.get("VERSION", "0.0.1");
+        return Config.get("VERSION", "0.0.1-SNAPSHOT");
     }
 
     @Override
@@ -21,7 +21,7 @@ public class TemplateParameter implements Parameter{
 
     @Override
     public String getGroupId() {
-        return Config.get("GROUP_ID", "___tester___");
+        return Config.get("GROUP_ID", "###tester###");
     }
 
     @Override

@@ -39,12 +39,13 @@ public class App {
 
         TemplateParameter templateParameter = new TemplateParameter();
         TemplateGenerator templateGenerator = new TemplateGenerator(templateParameter, new MavenBuildTransformer());
-        boolean generated = templateGenerator.generate();
-        if(generated) {
-            c.singleton(TemplateGenerator.class, templateGenerator);
-        }else{
-            throw new GeneratorException("Unable to build template");
-        }
+        c.singleton(TemplateGenerator.class, templateGenerator);
+
+//        boolean generated = templateGenerator.generate();
+//        if(generated) {
+//        }else{
+//            throw new GeneratorException("Unable to build template");
+//        }
 
         try {
             RouteBuilder builder = new RouteBuilder();
