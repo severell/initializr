@@ -1,4 +1,6 @@
 {
     "/src/main/resources/compiled/js/app.js": "/src/main/resources/compiled/js/app.js",
-    "/src/main/resources/compiled/css/main.css": "/src/main/resources/compiled/css/main.css"
+    "/src/main/resources/compiled/css/main.css": "/src/main/resources/compiled/css/main.css",
+    "/src/main/resources/compiled/images/favicon.ico": "/src/main/resources/compiled/images/favicon.ico",
+    "/src/main/resources/compiled/images/logo.png": "/src/main/resources/compiled/images/logo.png"
 }
