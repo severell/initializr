@@ -22,9 +22,12 @@ public class TemplateFileOperation extends FileOperation {
     private TemplateParameter parameter ;
     private String dirPath;
 
-    TemplateFileOperation(TemplateParameter param){
+    TemplateFileOperation(TemplateParameter param, String version){
         parameter = param;
-        dirPath = Config.get("TEMPLATE_DIR").concat( this.getFileSeparator()).concat(parameter.getName());
+        dirPath = Config.get("TEMPLATE_DIR", System.getProperty("java.io.tmpdir"))
+                .concat( this.getFileSeparator()).concat(parameter.getName())
+                .concat( this.getFileSeparator()).concat(version);
+
     }
 
     private Path getProjectDirectoryPath(){

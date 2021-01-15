@@ -14,7 +14,7 @@ public class TemplateParameterTest {
         TemplateParameter parameter = new TemplateParameter();
         assertFalse(Config.isLoaded());
         assertEquals(parameter.getName(), "severell");
-        assertEquals(parameter.getVersion(), "0.0.1");
+        assertEquals(parameter.getVersion(), "0.0.1-SNAPSHOT");
         assertEquals(parameter.getArtifactId(), "##test##");
         assertEquals(parameter.getGroupId(), "___tester___");
         assertEquals(parameter.getDescription(), "__description__");

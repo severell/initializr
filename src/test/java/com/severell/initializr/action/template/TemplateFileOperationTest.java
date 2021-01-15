@@ -16,7 +16,7 @@ public class TemplateFileOperationTest {
     @Test
     public void testTemplatePaths(){
         TemplateParameter parameter = new TemplateParameter();
-        TemplateFileOperation operation = new TemplateFileOperation(parameter);
+        TemplateFileOperation operation = new TemplateFileOperation(parameter, "0.0.1");
 
         String templateDir = Files.temporaryFolderPath().concat( File.separator).concat(parameter.getName());;
         assertEquals(operation.getDirectoryPath(), Paths.get(templateDir.concat(File.separator).concat(parameter.getArtifactId())));

@@ -41,12 +41,12 @@ public class MainController {
         resp.download(new File(Path.of(file.toString(), request.input("artifact")) + ".zip"), "application/zip", "severell.zip");
     }
 
-    public void generate(Request request, Response resp, TemplateGenerator templateGenerator) throws IOException, GeneratorException, ExecutionException, InterruptedException {
+    public void generate(Request request, Response resp) throws IOException, GeneratorException, ExecutionException, InterruptedException {
         InputParameter parameter = new InputParameter(request);
         StructureGenerator structureGenerator = null;
         try {
             TemplateParameter templateParameter = new TemplateParameter();
-            String sourcePath = Config.get("TEMPLATE_DIR").concat( File.separator).concat(templateParameter.getName())
+            String sourcePath = Config.get("TEMPLATE_DIR", System.getProperty("java.io.tmpdir")).concat( File.separator).concat(templateParameter.getName())
                     .concat(File.separator).concat(parameter.getVersion())
                     .concat(File.separator).concat(templateParameter.getArtifactId());
 

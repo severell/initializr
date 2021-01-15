@@ -37,15 +37,11 @@ public class App {
             provider.register();
         }
 
-        TemplateParameter templateParameter = new TemplateParameter();
-        TemplateGenerator templateGenerator = new TemplateGenerator(templateParameter, new MavenBuildTransformer());
-        c.singleton(TemplateGenerator.class, templateGenerator);
-
-//        boolean generated = templateGenerator.generate();
-//        if(generated) {
-//        }else{
-//            throw new GeneratorException("Unable to build template");
-//        }
+        if(!Config.get("ENV", "PROD").equals("PROD")) {
+            TemplateParameter templateParameter = new TemplateParameter();
+            TemplateGenerator templateGenerator = new TemplateGenerator(templateParameter, new MavenBuildTransformer(), "0.0.1");
+            boolean generated = templateGenerator.generate();
+        }
 
         try {
             RouteBuilder builder = new RouteBuilder();

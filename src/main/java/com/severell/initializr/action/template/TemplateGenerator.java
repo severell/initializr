@@ -10,10 +10,11 @@ public class TemplateGenerator {
     private TemplateFileOperation fileOperation = null;
     private  BuildTransformer transformer;
 
-    public TemplateGenerator(TemplateParameter parameter, BuildTransformer buildTransformer){
+
+    public TemplateGenerator(TemplateParameter parameter, BuildTransformer buildTransformer, String version){
         this.transformer = buildTransformer;
         this.parameter = parameter;
-        fileOperation = new TemplateFileOperation(parameter);
+        fileOperation = new TemplateFileOperation(parameter, version);
     }
 
     public Path getDirectory(){
