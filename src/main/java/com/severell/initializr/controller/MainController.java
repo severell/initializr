@@ -11,6 +11,7 @@ import com.severell.initializr.internal.maven.MavenProjectGenerator;
 import com.severell.initializr.internal.zip.Zipper;
 import com.severell.initializr.models.MavenBuildTransformer;
 import com.severell.initializr.models.parameter.InputParameter;
+import com.severell.initializr.models.parameter.TemplateParameter;
 import org.apache.maven.shared.invoker.MavenInvocationException;
 
 import java.io.File;
@@ -40,11 +41,16 @@ public class MainController {
         resp.download(new File(Path.of(file.toString(), request.input("artifact")) + ".zip"), "application/zip", "severell.zip");
     }
 
-    public void generate(Request request, Response resp, TemplateGenerator templateGenerator) throws IOException, GeneratorException, ExecutionException, InterruptedException {
+    public void generate(Request request, Response resp) throws IOException, GeneratorException, ExecutionException, InterruptedException {
         InputParameter parameter = new InputParameter(request);
         StructureGenerator structureGenerator = null;
         try {
-            structureGenerator = new StructureGenerator(parameter, new MavenBuildTransformer(), templateGenerator.getDirectory());
+            TemplateParameter templateParameter = new TemplateParameter();
+            String sourcePath = Config.get("TEMPLATE_DIR", System.getProperty("java.io.tmpdir")).concat( File.separator).concat(templateParameter.getName())
+                    .concat(File.separator).concat(parameter.getVersion())
+                    .concat(File.separator).concat(templateParameter.getArtifactId());
+
+            structureGenerator = new StructureGenerator(parameter, new MavenBuildTransformer(), Path.of(sourcePath));
             structureGenerator.generate();
             Path downloadPath = structureGenerator.download();
             resp.download(downloadPath.toFile(), "application/zip", parameter.getName().concat(".zip"));
